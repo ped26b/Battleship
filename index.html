@@ -437,6 +437,7 @@
     <input type="text" id="nameInput" placeholder="Your name (optional)" />
     <button class="btn" id="saveNameBtn">Save name</button>
     <button class="btn danger" id="resetBtn">Reset this team's board</button>
+    <button class="btn" id="captainBtn">Captain</button>
     <button class="btn" id="adminBtn">Admin</button>
   </div>
 
@@ -486,8 +487,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Change this before publishing the page publicly.
+// Change these before publishing the page publicly.
 const ADMIN_PASSWORD = "kraken";
+const CAPTAIN_PASSWORDS = {
+  teamA: "teamA-captain",
+  teamB: "teamB-captain"
+};
 
 // ---- Source task pool: [category, task, tileCount] ----
 const SOURCE = [
@@ -619,6 +624,7 @@ const boardState = {
 let currentTeam = 'teamA';
 let isAdmin = false;
 let placementMode = false;
+const captainAuth = { teamA: false, teamB: false };
 
 // ---- render legend ----
 const legendEl = document.getElementById('legend');
@@ -631,8 +637,11 @@ Object.keys(CAT_LABEL).filter(k=>k!=='misc').forEach(cat=>{
 
 function hitMarkSVG(){
   return `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="12" r="10" fill="#7a1e1e" opacity="0.9"/>
-    <path d="M7 7 L17 17 M17 7 L7 17" stroke="#f2cf5e" stroke-width="2.4" stroke-linecap="round"/>
+    <circle cx="12" cy="12" r="10" fill="#f2e6c8"/>
+    <circle cx="12" cy="12" r="10" fill="none" stroke="#7a1e1e" stroke-width="1.2"/>
+    <circle cx="12" cy="12" r="7" fill="#a83232"/>
+    <circle cx="12" cy="12" r="4.2" fill="#f2e6c8"/>
+    <circle cx="12" cy="12" r="1.8" fill="#7a1e1e"/>
   </svg>`;
 }
 function missMarkSVG(){
@@ -716,9 +725,13 @@ function updateShipCountLabel(){
 function handleTileClick(i){
   if(isAdmin && placementMode){
     toggleShip(i);
-  } else {
-    toggleTile(i);
+    return;
   }
+  if(!isAdmin && !captainAuth[currentTeam]){
+    alert(`Only ${currentTeam === 'teamA' ? 'Team A' : 'Team B'} captains can mark tiles complete. Log in with the "Captain" button first.`);
+    return;
+  }
+  toggleTile(i);
 }
 
 function toggleTile(i){
@@ -808,7 +821,20 @@ function switchTeam(team){
   document.getElementById('tabA').classList.toggle('active', team === 'teamA');
   document.getElementById('tabB').classList.toggle('active', team === 'teamB');
   document.getElementById('adminTeamLabel').textContent = team === 'teamA' ? 'Team A' : 'Team B';
+  updateCaptainButton();
   renderBoard();
+}
+
+function updateCaptainButton(){
+  const btn = document.getElementById('captainBtn');
+  const teamLabel = currentTeam === 'teamA' ? 'Team A' : 'Team B';
+  if(captainAuth[currentTeam]){
+    btn.textContent = `Captain ✓ (${teamLabel})`;
+    btn.classList.add('active-toggle');
+  } else {
+    btn.textContent = `Captain (${teamLabel})`;
+    btn.classList.remove('active-toggle');
+  }
 }
 
 // ---- reset ----
@@ -848,6 +874,25 @@ adminBtn.addEventListener('click', () => {
     adminPanel.classList.add('open');
     adminBtn.classList.add('active-toggle');
     adminBtn.textContent = 'Admin ✓';
+  } else {
+    alert('Incorrect password.');
+  }
+});
+
+document.getElementById('captainBtn').addEventListener('click', () => {
+  const teamLabel = currentTeam === 'teamA' ? 'Team A' : 'Team B';
+  if(captainAuth[currentTeam]){
+    if(confirm(`Log out as ${teamLabel} captain on this device?`)){
+      captainAuth[currentTeam] = false;
+      updateCaptainButton();
+    }
+    return;
+  }
+  const pw = prompt(`${teamLabel} captain password:`);
+  if(pw === null) return;
+  if(pw === CAPTAIN_PASSWORDS[currentTeam]){
+    captainAuth[currentTeam] = true;
+    updateCaptainButton();
   } else {
     alert('Incorrect password.');
   }
@@ -896,6 +941,7 @@ document.getElementById('clearShipsBtn').addEventListener('click', () => {
 
 // ---- boot ----
 loadName();
+updateCaptainButton();
 renderBoard();
 initFirebase();
 </script>
