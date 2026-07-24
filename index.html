@@ -18,16 +18,18 @@
     --gold:#c9a227;
     --gold-bright:#f2cf5e;
 
-    --skilling:#1e5fa8;
-    --skilling-dk:#123a68;
-    --clues:#1f7a4d;
-    --clues-dk:#124d30;
-    --bosses:#a83232;
-    --bosses-dk:#6e1f1f;
-    --raids:#8a5fc9;
-    --raids-dk:#573a82;
-    --misc:#6b6b76;
-    --misc-dk:#454550;
+    --common:#6b6b76;
+    --common-dk:#454550;
+    --uncommon:#1f7a4d;
+    --uncommon-dk:#124d30;
+    --rare:#1e5fa8;
+    --rare-dk:#123a68;
+    --epic:#8a5fc9;
+    --epic-dk:#573a82;
+    --legendary:#e0861f;
+    --legendary-dk:#8a4f0f;
+    --bonus:#3f9c96;
+    --bonus-dk:#255d59;
 
     --hit:#a83232;
     --miss:#2a6fbd;
@@ -81,7 +83,7 @@
   .sub{
     font-size:13px;
     color:var(--parchment-dark);
-    max-width:620px;
+    max-width:640px;
     margin:0 auto;
     line-height:1.5;
   }
@@ -105,6 +107,7 @@
   /* team tabs */
   .team-tabs{
     display:flex;
+    flex-wrap:wrap;
     justify-content:center;
     gap:10px;
     margin:18px 0 6px;
@@ -130,6 +133,8 @@
   }
   .team-tab[data-team="teamA"].active{box-shadow:inset 0 3px 0 var(--teamA);}
   .team-tab[data-team="teamB"].active{box-shadow:inset 0 3px 0 var(--teamB);}
+  .team-tab[data-team="tasklist"].active{box-shadow:inset 0 3px 0 var(--epic);}
+  .team-tab[data-team="gmlog"].active{box-shadow:inset 0 3px 0 var(--legendary);}
 
   /* comparison bar — always visible for both teams */
   .compare{
@@ -179,6 +184,50 @@
   }
   .progress-label b{color:var(--gold-bright);}
 
+  /* fleet status panel — shows ship shapes below the tracking bar */
+  .fleet-panel{
+    max-width:900px;
+    margin:14px auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  .fleet-col{
+    background:var(--wood-dark);
+    border:2px solid var(--gold);
+    border-radius:6px;
+    padding:10px 14px;
+  }
+  .fleet-col h4{
+    margin:0 0 8px;
+    font-family:'Cinzel', serif;
+    font-size:13px;
+    letter-spacing:0.03em;
+    color:var(--gold-bright);
+  }
+  .fleet-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .fleet-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11.5px;
+    color:var(--parchment-dark);
+  }
+  .fleet-item .fleet-icon{width:16px; text-align:center; flex-shrink:0;}
+  .fleet-item.sunk{color:var(--hit); text-decoration:line-through; opacity:0.8;}
+  .fleet-item.unplaced{opacity:0.4; font-style:italic;}
+
+  @media (max-width:700px){
+    .fleet-panel{grid-template-columns:1fr;}
+  }
+
   /* controls row */
   .controls{
     display:flex;
@@ -217,16 +266,16 @@
   .btn:active{transform:translateY(1px);}
   .btn.danger{border-color:var(--hit);}
   .btn.active-toggle{
-    background:linear-gradient(180deg, var(--raids), var(--raids-dk));
+    background:linear-gradient(180deg, var(--epic), var(--epic-dk));
     border-color:var(--gold-bright);
   }
 
   /* admin panel */
   .admin-panel{
-    max-width:640px;
+    max-width:680px;
     margin:0 auto 20px;
     background:var(--wood-dark);
-    border:2px dashed var(--raids);
+    border:2px dashed var(--epic);
     border-radius:6px;
     padding:14px 16px;
     display:none;
@@ -236,7 +285,7 @@
     margin:0 0 8px;
     font-family:'Cinzel', serif;
     font-size:14px;
-    color:var(--raids);
+    color:var(--epic);
     letter-spacing:0.03em;
   }
   .admin-panel p{
@@ -252,6 +301,36 @@
     align-items:center;
     margin-bottom:8px;
   }
+
+  /* ship palette */
+  .ship-palette{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin:10px 0;
+  }
+  .ship-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:11.5px;
+    background:rgba(0,0,0,0.22);
+    padding:6px 8px;
+    border-radius:4px;
+    border:1px solid transparent;
+  }
+  .ship-row.selected{border-color:var(--gold-bright);}
+  .ship-shape-preview{
+    display:grid;
+    gap:1px;
+    flex-shrink:0;
+  }
+  .ship-shape-cell{
+    width:8px;height:8px;
+    background:var(--parchment-dark);
+    border-radius:1px;
+  }
+  .ship-shape-cell.empty{background:transparent;}
 
   /* legend */
   .legend{
@@ -323,11 +402,12 @@
     top:0;left:0;right:0;
     height:4px;
   }
-  .cat-skilling{background:var(--skilling);}
-  .cat-clues{background:var(--clues);}
-  .cat-bosses{background:var(--bosses);}
-  .cat-raids{background:var(--raids);}
-  .cat-misc{background:var(--misc);}
+  .tier-common{background:var(--common);}
+  .tier-uncommon{background:var(--uncommon);}
+  .tier-rare{background:var(--rare);}
+  .tier-epic{background:var(--epic);}
+  .tier-legendary{background:var(--legendary);}
+  .tier-bonus{background:var(--bonus);}
 
   .tile-text{
     margin-top:3px;
@@ -372,8 +452,56 @@
     z-index:3;
     filter:drop-shadow(0 0 2px rgba(0,0,0,0.8));
   }
+  .legendary-hint{
+    position:absolute;
+    top:2px;
+    right:2px;
+    width:11px;
+    height:11px;
+    z-index:3;
+    filter:drop-shadow(0 0 2px rgba(0,0,0,0.8));
+  }
   .tile.placement-mode{cursor:crosshair;}
-  .tile.placement-mode:hover{outline:2px dashed var(--raids-bright, #b98fe8);}
+  .tile.placement-mode:hover{outline:2px dashed #b98fe8;}
+  .tile.ship-preview-ok{outline:3px dashed #6fffb0 !important;}
+  .tile.ship-preview-bad{outline:3px dashed var(--hit) !important;}
+
+  /* task list / GM log tables */
+  .task-table-wrap{
+    max-width:900px;
+    margin:0 auto;
+    background:var(--wood-dark);
+    border:2px solid var(--gold);
+    border-radius:8px;
+    padding:16px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(0,0,0,0.35);
+  }
+  .task-table-wrap h3{
+    margin:0 0 10px;
+    font-family:'Cinzel', serif;
+    color:var(--gold-bright);
+    font-size:15px;
+  }
+  .task-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+  }
+  .task-table th{
+    text-align:left;
+    padding:7px 8px;
+    border-bottom:2px solid var(--gold);
+    color:var(--gold-bright);
+    font-family:'Cinzel', serif;
+    font-size:11px;
+    letter-spacing:0.03em;
+  }
+  .task-table td{
+    padding:6px 8px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    color:var(--parchment-dark);
+  }
+  .task-table tr:hover td{background:rgba(255,255,255,0.04);}
 
   footer{
     text-align:center;
@@ -410,13 +538,15 @@
   <header>
     <div class="eyebrow">Old School RuneScape · Clan Event</div>
     <h1>Battleship Bingo</h1>
-    <p class="sub">196 tiles per team. Click a tile once your team has completed it to mark it sunk. Some tiles hide an enemy ship — completing them reveals a hit or a miss. Progress is synced live for everyone viewing this board.</p>
+    <p class="sub">196 tiles per team, ranked Common → Legendary. Click a tile once your team has completed it to mark it sunk. Some tiles hide an enemy ship — completing them reveals a hit or a miss. Progress is synced live for everyone viewing this board.</p>
     <div class="sync-status"><span class="sync-dot" id="syncDot"></span><span id="syncText">Connecting…</span></div>
   </header>
 
   <div class="team-tabs">
     <button class="team-tab active" id="tabA" data-team="teamA">⚓ Team A</button>
     <button class="team-tab" id="tabB" data-team="teamB">⚓ Team B</button>
+    <button class="team-tab" id="tabTasks" data-team="tasklist">📋 Task List</button>
+    <button class="team-tab" id="tabGM" data-team="gmlog" style="display:none;">🗒 GM Log</button>
   </div>
 
   <div class="compare">
@@ -433,26 +563,30 @@
   </div>
   <div class="progress-label" id="progressLabel">Loading board…</div>
 
+  <div class="fleet-panel" id="fleetPanel">
+    <div class="fleet-col"><h4>⚓ Team A Fleet</h4><ul class="fleet-list" id="fleetListA"></ul></div>
+    <div class="fleet-col"><h4>⚓ Team B Fleet</h4><ul class="fleet-list" id="fleetListB"></ul></div>
+  </div>
+
   <div class="controls">
     <input type="text" id="nameInput" placeholder="Your name (optional)" />
     <button class="btn" id="saveNameBtn">Save name</button>
     <button class="btn danger" id="resetBtn">Reset this team's board</button>
     <button class="btn" id="captainBtn">Captain</button>
     <button class="btn" id="adminBtn">Admin</button>
+    <button class="btn" id="gmBtn">Game Master</button>
   </div>
 
   <div class="admin-panel" id="adminPanel">
-    <h3>Admin — Hidden Ships (editing <span id="adminTeamLabel">Team A</span>)</h3>
-    <p>Placement mode lets you click tiles to hide a ship on them without revealing it to players. A hidden ship is only shown to players as a "HIT" once that tile is marked complete — everything else resolves as a "MISS". Ship data lives in the same Firestore document as the board, so treat this as clan-honor-system hidden rather than cryptographically secure.</p>
+    <h3>Admin — Fleet Placement (editing <span id="adminTeamLabel">Team A</span>)</h3>
+    <p>Enable placement mode, pick a ship below, rotate it if needed, then click a tile on the board to anchor it. Hover a tile first to preview the footprint — green dashes mean a valid spot, red means invalid. Each ship may only be placed once per team, ships can't overlap, and a single ship can cover at most one Legendary-tier tile. Hidden ships only resolve as a "HIT" once that tile is marked complete — everything else resolves as a "MISS". Ship data lives in the same Firestore document as the board, so treat this as clan-honor-system hidden rather than cryptographically secure.</p>
     <div class="admin-row">
       <button class="btn" id="placementModeBtn">Enable placement mode</button>
-      <span id="shipCountLabel" style="font-size:11.5px;color:var(--parchment-dark);">0 ships placed</span>
-    </div>
-    <div class="admin-row">
-      <input type="number" id="randomShipCount" min="1" max="40" value="12" style="width:70px;" />
-      <button class="btn" id="randomizeShipsBtn">Randomize ships</button>
+      <button class="btn" id="randomizeShipsBtn">Randomize all ships</button>
       <button class="btn danger" id="clearShipsBtn">Clear all ships</button>
     </div>
+    <div class="admin-row" id="rotationRow" style="display:none;"></div>
+    <div class="ship-palette" id="shipPalette"></div>
     <div class="admin-row">
       <button class="btn" id="logoutAdminBtn">Exit admin mode</button>
     </div>
@@ -460,11 +594,14 @@
 
   <div class="legend" id="legend"></div>
 
-  <div class="board-frame">
+  <div class="board-frame" id="boardFrame">
     <div class="board" id="board">
       <div class="loading">Loading tiles…</div>
     </div>
   </div>
+
+  <div class="task-table-wrap" id="taskTableWrap" style="display:none;"></div>
+  <div class="task-table-wrap" id="gmPanel" style="display:none;"></div>
 
   <footer>Click any tile to toggle complete. Board state is stored in Firebase and synced automatically to everyone viewing this page.</footer>
 </div>
@@ -472,7 +609,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, setDoc, onSnapshot
+  getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 // ---- Firebase setup ----
@@ -489,113 +626,122 @@ const db = getFirestore(app);
 
 // Change these before publishing the page publicly.
 const ADMIN_PASSWORD = "kraken";
+const GM_PASSWORD = "periscope";
 const CAPTAIN_PASSWORDS = {
   teamA: "teamA-captain",
   teamB: "teamB-captain"
 };
 
-// ---- Source task pool: [category, task, tileCount] ----
+// ---- Source task pool: [tier, task, tileCount] ----
 const SOURCE = [
-  ['skilling',"Karil's piece",2],
-  ['skilling',"Dharok's piece",2],
-  ['skilling',"Guthan's piece",2],
-  ['skilling',"Torag's piece",2],
-  ['skilling',"Verac's piece",2],
-  ['skilling',"Jad",8],
-  ['skilling',"100k Woodcutting exp",2],
-  ['skilling',"100k Runecraft exp",2],
-  ['skilling',"100k Hunter exp",2],
-  ['skilling',"100k Fishing exp",2],
-  ['skilling',"100k Agility exp",2],
-  ['skilling',"100k Mining exp",2],
-  ['skilling',"100k Thieving exp",2],
-  ['clues',"Beginner clue x amount",3],
-  ['clues',"Easy clue x amount",3],
-  ['clues',"Medium clue x amount",3],
-  ['clues',"Hard clue x amount",3],
-  ['clues',">500k drop",8],
-  ['bosses',"Ancient shard (non-Skotizo)",4],
-  ['clues',"Bottomless bucket",2],
-  ['clues',"Cow slips",2],
-  ['bosses',"Titan's crown piece",2],
-  ['bosses',"Tzhaar drop",2],
-  ['clues',"Earn Larran's key",5],
-  ['clues',"Brimstone key",5],
-  ['bosses',"Immaculate mole skin",2],
-  ['clues',"Steel ring",2],
-  ['clues',"Quest points",2],
-  ['clues',"Diaries",2],
-  ['bosses',"Scurry spine",2],
-  ['clues',"Monkey tail drop",1],
-  ['clues',"Hunter rumour (exclusive)",2],
-  ['clues',"Strange old lockpick drop",2],
-  ['bosses',"Black mask drop",1],
-  ['clues',"Elite clue x amount",3],
-  ['clues',"Master clue x amount",3],
-  ['bosses',"Pet (any)",1],
-  ['bosses',"Dragon boots drop",1],
-  ['skilling',"GOTR (bag/ring/needle/protector/lantern)",1],
-  ['skilling',"Off-hand skilling tool (knife, hammer, chisel)",1],
-  ['bosses',"Abyssal whip",3],
-  ['bosses',"Vorkath's head",2],
-  ['bosses',"Granite hammer",2],
-  ['bosses',"Saradomin cudgel",2],
-  ['bosses',"Zenyte gem",2],
-  ['bosses',"Kree'arra drop (not shard)",4],
-  ['bosses',"Zilyana drop (not shard)",4],
-  ['bosses',"Kril Tsutsaroth drop (not shard)",4],
-  ['bosses',"Bandos drop (not shard)",4],
-  ['bosses',"Blood shard",2],
-  ['bosses',"Big fish",1],
-  ['bosses',"Berserker ring",2],
-  ['bosses',"Archer ring",2],
-  ['bosses',"Warrior ring",2],
-  ['raids',"DT2 unique",1],
-  ['bosses',"Slayer boss unique",4],
-  ['bosses',"Blood Moon drop",4],
-  ['bosses',"Eclipse Moon drop",4],
-  ['bosses',"Blue Moon drop",4],
-  ['bosses',"Huey unique",2],
-  ['bosses',">1m drop",8],
-  ['bosses',"Deep sea trolling fish unique",1],
-  ['bosses',"Burning claw",1],
-  ['bosses',"Seers ring",2],
-  ['bosses',"Piece of Sunfire drop",2],
-  ['bosses',"Tempoross unique",2],
-  ['bosses',"Wintertodt unique",2],
-  ['bosses',"Venator shard",2],
-  ['bosses',"Pharaoh's sceptre",1],
-  ['raids',"Nex unique",1],
-  ['raids',"Tormented synapse",2],
-  ['raids',"Yama unique",1],
-  ['raids',"Zulrah unique",3],
-  ['raids',"Duke Sucellus unique",1],
-  ['raids',"Muspah unique",1],
-  ['raids',"Pet (exclusive, no chompy/ele)",1],
-  ['raids',"Maggot king fang",1],
-  ['raids',"DT2 unique (vestige/axe/ring/pet)",1],
-  ['raids',"ToA unique",1],
-  ['raids',"ToB unique",1],
-  ['raids',"CoX unique",1],
-  ['raids',"Crystal armour seed",1],
-  ['raids',"Crystal weapon seed",1],
-  ['misc',"Bonus tile — add your task",1],
-  ['misc',"Bonus tile — add your task",1],
-  ['misc',"Bonus tile — add your task",1],
+  // COMMON — 44 tiles
+  ['common',"Karil's piece",2],
+  ['common',"Dharok's piece",2],
+  ['common',"Guthan's piece",2],
+  ['common',"Torag's piece",2],
+  ['common',"Verac's piece",2],
+  ['common',"Jad",8],
+  ['common',"100k Woodcutting exp",2],
+  ['common',"100k Runecraft exp",2],
+  ['common',"100k Hunter exp",2],
+  ['common',"100k Fishing exp",2],
+  ['common',"100k Agility exp",2],
+  ['common',"100k Mining exp",2],
+  ['common',"100k Thieving exp",2],
+  ['common',"Beginner clue x amount",3],
+  ['common',"Easy clue x amount",3],
+  ['common',"Medium clue x amount",3],
+  ['common',"Hard clue x amount",3],
+  // UNCOMMON — 52 tiles
+  ['uncommon',">500k drop",8],
+  ['uncommon',"Ancient shard (non-Skotizo)",4],
+  ['uncommon',"Bottomless bucket",2],
+  ['uncommon',"Cow slips",2],
+  ['uncommon',"Titan's crown piece",2],
+  ['uncommon',"Tzhaar drop",2],
+  ['uncommon',"Earn Larran's key",5],
+  ['uncommon',"Brimstone key",5],
+  ['uncommon',"Immaculate mole skin",2],
+  ['uncommon',"Steel ring",2],
+  ['uncommon',"Quest points",2],
+  ['uncommon',"Diaries",2],
+  ['uncommon',"Scurry spine",2],
+  ['uncommon',"Monkey tail drop",1],
+  ['uncommon',"Hunter rumour (exclusive)",2],
+  ['uncommon',"Strange old lockpick drop",2],
+  ['uncommon',"Black mask drop",1],
+  ['uncommon',"Elite clue x amount",3],
+  ['uncommon',"Master clue x amount",3],
+  // RARE — 80 tiles
+  ['rare',"Pet (any)",1],
+  ['rare',"Dragon boots drop",1],
+  ['rare',"GOTR (bag/ring/needle/protector/lantern)",1],
+  ['rare',"Off-hand skilling tool (knife, hammer, chisel)",1],
+  ['rare',"Abyssal whip",3],
+  ['rare',"Vorkath's head",2],
+  ['rare',"Granite hammer",2],
+  ['rare',"Saradomin cudgel",2],
+  ['rare',"Zenyte gem",2],
+  ['rare',"Kree'arra drop (not shard)",4],
+  ['rare',"Zilyana drop (not shard)",4],
+  ['rare',"Kril Tsutsaroth drop (not shard)",4],
+  ['rare',"Bandos drop (not shard)",4],
+  ['rare',"Blood shard",2],
+  ['rare',"Big fish",1],
+  ['rare',"Berserker ring",2],
+  ['rare',"Archer ring",2],
+  ['rare',"Warrior ring",2],
+  ['rare',"DT2 unique",1],
+  ['rare',"Slayer boss unique",4],
+  ['rare',"Blood Moon drop",4],
+  ['rare',"Eclipse Moon drop",4],
+  ['rare',"Blue Moon drop",4],
+  ['rare',"Huey unique",2],
+  ['rare',">1m drop",8],
+  ['rare',"Deep sea trolling fish unique",1],
+  ['rare',"Burning claw",1],
+  ['rare',"Seers ring",2],
+  ['rare',"Piece of Sunfire drop",2],
+  ['rare',"Tempoross unique",2],
+  ['rare',"Wintertodt unique",2],
+  ['rare',"Venator shard",2],
+  ['rare',"Pharaoh's sceptre",1],
+  // EPIC — 8 tiles
+  ['epic',"Tormented synapse",2],
+  ['epic',"Zulrah unique",3],
+  ['epic',"Tombs of Amascut (ToA) unique",1],
+  ['epic',"Theatre of Blood (ToB) unique",1],
+  ['epic',"Chambers of Xeric (CoX) unique",1],
+  // LEGENDARY — 9 tiles
+  ['legendary',"Nex unique",1],
+  ['legendary',"Yama unique",1],
+  ['legendary',"Duke Sucellus unique",1],
+  ['legendary',"Muspah unique",1],
+  ['legendary',"Pet (exclusive, no chompy/ele)",1],
+  ['legendary',"Maggot king fang",1],
+  ['legendary',"DT2 unique (vestige/axe/ring/pet)",1],
+  ['legendary',"Crystal armour seed",1],
+  ['legendary',"Crystal weapon seed",1],
+  // BONUS — 3 tiles (fills the board to a full 14x14)
+  ['bonus',"Bonus tile — add your task",1],
+  ['bonus',"Bonus tile — add your task",1],
+  ['bonus',"Bonus tile — add your task",1],
 ];
 
-const CAT_LABEL = {
-  skilling:"Skilling & Gear",
-  clues:"Clues & Misc",
-  bosses:"Boss Drops",
-  raids:"Raids & Big Ticket",
-  misc:"Bonus"
+const TIER_LABEL = {
+  common:"Common",
+  uncommon:"Uncommon",
+  rare:"Rare",
+  epic:"Epic",
+  legendary:"Legendary",
+  bonus:"Bonus"
 };
+const TIER_ORDER = ['legendary','epic','rare','uncommon','common','bonus'];
 
 // flatten
 let tiles = [];
-SOURCE.forEach(([cat, task, count]) => {
-  for(let i=0;i<count;i++) tiles.push({task, cat});
+SOURCE.forEach(([tier, task, count]) => {
+  for(let i=0;i<count;i++) tiles.push({task, tier});
 });
 
 // deterministic shuffle so every visitor / both teams see the same tile layout
@@ -613,25 +759,100 @@ function seededShuffle(arr, seed){
   return a;
 }
 tiles = seededShuffle(tiles, 8675309).slice(0,196);
-const TOTAL = tiles.length;
+const TOTAL = tiles.length; // 196 = 14x14
+
+// ---- ship shapes (offsets are [row, col] within the shape's bounding box) ----
+const SHIP_TYPES = [
+  {id:1, name:"Frigate",       cells:[[0,0],[1,0],[2,0],[3,0]]},
+  {id:2, name:"Bracket-hull",  cells:[[0,0],[0,1],[1,0],[2,0],[2,1]]},
+  {id:3, name:"Scout L",       cells:[[0,0],[1,0],[2,0],[2,1]]},
+  {id:4, name:"Skiff",         cells:[[0,0],[1,0]]},
+  {id:5, name:"Cross Cruiser", cells:[[0,1],[1,0],[1,1],[1,2],[2,1]]},
+  {id:6, name:"Raider",        cells:[[0,1],[1,0],[1,1],[2,0],[2,1]]},
+  {id:7, name:"Scout L-II",    cells:[[0,0],[1,0],[2,0],[2,1]]},
+  {id:8, name:"Dreadnought",   cells:[[0,0],[1,0],[2,0],[3,0],[4,0]]},
+  {id:9, name:"Cutter",        cells:[[0,0],[1,0],[2,0]]},
+];
+
+function rotateCells(cells, rotation){
+  let cur = cells.map(c => c.slice());
+  const times = ((rotation/90)%4 + 4) % 4;
+  for(let t=0;t<times;t++){
+    const maxR = Math.max(...cur.map(c => c[0]));
+    cur = cur.map(([r,c]) => [c, maxR - r]);
+  }
+  const minR = Math.min(...cur.map(c => c[0]));
+  const minC = Math.min(...cur.map(c => c[1]));
+  return cur.map(([r,c]) => [r - minR, c - minC]);
+}
+function shipDims(cells){
+  const maxR = Math.max(...cells.map(c => c[0]));
+  const maxC = Math.max(...cells.map(c => c[1]));
+  return {rows: maxR + 1, cols: maxC + 1};
+}
+function tileToRC(i){ return {row: Math.floor(i/14), col: i % 14}; }
+function rcToTile(row, col){ return row*14 + col; }
+
+function computeShipIndices(shipId, rotation, anchorRow, anchorCol){
+  const type = SHIP_TYPES.find(s => s.id === shipId);
+  if(!type) return null;
+  const rot = rotateCells(type.cells, rotation);
+  const indices = [];
+  for(const [r,c] of rot){
+    const row = anchorRow + r;
+    const col = anchorCol + c;
+    if(row < 0 || row >= 14 || col < 0 || col >= 14) return null;
+    indices.push(rcToTile(row, col));
+  }
+  return indices;
+}
+
+function shipCellsSet(team){
+  const set = new Set();
+  const placements = boardState[team].shipPlacements || {};
+  Object.values(placements).forEach(p => p.indices.forEach(i => set.add(i)));
+  return set;
+}
+
+function validatePlacement(team, shipId, indices, ignoreShipId){
+  if(!indices) return "Ship would extend off the board.";
+  const placements = boardState[team].shipPlacements || {};
+  const occupied = new Set();
+  Object.entries(placements).forEach(([id, p]) => {
+    if(ignoreShipId != null && parseInt(id,10) === ignoreShipId) return;
+    p.indices.forEach(i => occupied.add(i));
+  });
+  for(const i of indices){
+    if(occupied.has(i)) return "Overlaps another ship.";
+  }
+  const legendaryCount = indices.filter(i => tiles[i].tier === 'legendary').length;
+  if(legendaryCount > 1) return "A ship can only cover 1 Legendary task.";
+  return null;
+}
 
 // ---- app state ----
 const TEAMS = ['teamA','teamB'];
 const boardState = {
-  teamA: { state: new Array(TOTAL).fill(false), ships: new Array(TOTAL).fill(false) },
-  teamB: { state: new Array(TOTAL).fill(false), ships: new Array(TOTAL).fill(false) }
+  teamA: { state: new Array(TOTAL).fill(false), shipPlacements: {} },
+  teamB: { state: new Array(TOTAL).fill(false), shipPlacements: {} }
 };
 let currentTeam = 'teamA';
+let currentView = 'teamA'; // 'teamA' | 'teamB' | 'tasklist' | 'gmlog'
 let isAdmin = false;
+let isGM = false;
 let placementMode = false;
+let selectedShipId = null;
+let pendingRotation = 0;
+let lastPreviewIndices = [];
+let gmLogEntries = [];
 const captainAuth = { teamA: false, teamB: false };
 
 // ---- render legend ----
 const legendEl = document.getElementById('legend');
-Object.keys(CAT_LABEL).filter(k=>k!=='misc').forEach(cat=>{
+['common','uncommon','rare','epic','legendary','bonus'].forEach(tier => {
   const item = document.createElement('div');
   item.className = 'legend-item';
-  item.innerHTML = `<span class="legend-swatch cat-${cat}" style="background:var(--${cat})"></span>${CAT_LABEL[cat]}`;
+  item.innerHTML = `<span class="legend-swatch" style="background:var(--${tier})"></span>${TIER_LABEL[tier]}`;
   legendEl.appendChild(item);
 });
 
@@ -656,16 +877,22 @@ function shipMarkerSVG(){
     <path d="M12 3v7" stroke="#b98fe8" stroke-width="1.6"/>
   </svg>`;
 }
+function legendaryHintSVG(){
+  return `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2l2.6 6.6L22 9.2l-5.4 4.5L18.2 21 12 17l-6.2 4 1.6-7.3L2 9.2l7.4-0.6L12 2z" fill="#e0861f"/>
+  </svg>`;
+}
 
 // ---- board rendering ----
 const boardEl = document.getElementById('board');
 
 function renderBoard(){
   const data = boardState[currentTeam];
+  const shipSet = shipCellsSet(currentTeam);
   boardEl.innerHTML = '';
   tiles.forEach((t, i) => {
     const done = data.state[i];
-    const hasShip = data.ships[i];
+    const hasShip = shipSet.has(i);
     const el = document.createElement('button');
     el.type = 'button';
     let cls = 'tile';
@@ -681,14 +908,20 @@ function renderBoard(){
     if(done) markSVG = hasShip ? hitMarkSVG() : missMarkSVG();
 
     const showShipMarker = isAdmin && placementMode && hasShip && !done;
+    const showLegendaryHint = isAdmin && placementMode && t.tier === 'legendary' && !done;
 
     el.innerHTML = `
-      <div class="tile-cat-bar cat-${t.cat}"></div>
+      <div class="tile-cat-bar tier-${t.tier}"></div>
       <div class="tile-text">${t.task}</div>
       <div class="hit-mark">${markSVG}</div>
       ${showShipMarker ? `<div class="ship-marker">${shipMarkerSVG()}</div>` : ''}
+      ${showLegendaryHint ? `<div class="legendary-hint">${legendaryHintSVG()}</div>` : ''}
     `;
     el.addEventListener('click', () => handleTileClick(i));
+    el.addEventListener('mouseenter', () => {
+      if(isAdmin && placementMode && selectedShipId != null) showPlacementPreview(i);
+    });
+    el.addEventListener('mouseleave', clearPreview);
     boardEl.appendChild(el);
   });
   updateProgressLabel();
@@ -701,7 +934,7 @@ function updateProgressLabel(){
   document.getElementById('progressLabel').innerHTML =
     `<b>${done}</b> / ${TOTAL} tiles sunk on ${currentTeam === 'teamA' ? 'Team A' : 'Team B'} (${pct}%)`;
   updateCompareBar();
-  updateShipCountLabel();
+  renderFleetPanel();
 }
 
 function updateCompareBar(){
@@ -715,16 +948,150 @@ function updateCompareBar(){
   });
 }
 
-function updateShipCountLabel(){
+function renderFleetPanel(){
+  TEAMS.forEach((team, idx) => {
+    const suffix = idx === 0 ? 'A' : 'B';
+    const ul = document.getElementById('fleetList' + suffix);
+    if(!ul) return;
+    const data = boardState[team];
+    ul.innerHTML = '';
+    SHIP_TYPES.forEach(type => {
+      const placement = data.shipPlacements[type.id];
+      const li = document.createElement('li');
+      let icon = '—';
+      let sunk = false;
+      if(placement){
+        sunk = placement.indices.every(i => data.state[i]);
+        icon = sunk ? '💥' : '🚢';
+      }
+      li.className = 'fleet-item' + (!placement ? ' unplaced' : '') + (sunk ? ' sunk' : '');
+      li.innerHTML = `<span class="fleet-icon">${icon}</span>${type.name}${sunk ? ' — SUNK' : (placement ? '' : ' — not deployed')}`;
+      ul.appendChild(li);
+    });
+  });
+}
+
+// ---- ship placement UI ----
+function shipPreviewHTML(type, rotation){
+  const rot = rotateCells(type.cells, rotation);
+  const dims = shipDims(rot);
+  const filled = new Set(rot.map(([r,c]) => r + ',' + c));
+  let cellsHTML = '';
+  for(let r=0;r<dims.rows;r++){
+    for(let c=0;c<dims.cols;c++){
+      cellsHTML += `<div class="ship-shape-cell ${filled.has(r+','+c) ? '' : 'empty'}"></div>`;
+    }
+  }
+  return `<div class="ship-shape-preview" style="grid-template-columns:repeat(${dims.cols},8px);grid-template-rows:repeat(${dims.rows},8px);">${cellsHTML}</div>`;
+}
+
+function renderShipPalette(){
+  const wrap = document.getElementById('shipPalette');
+  if(!wrap) return;
   const data = boardState[currentTeam];
-  const count = data.ships.filter(Boolean).length;
-  document.getElementById('shipCountLabel').textContent = `${count} ship${count===1?'':'s'} placed`;
+  wrap.innerHTML = '';
+  SHIP_TYPES.forEach(type => {
+    const placement = data.shipPlacements[type.id];
+    const row = document.createElement('div');
+    row.className = 'ship-row' + (selectedShipId === type.id ? ' selected' : '');
+    row.innerHTML = `
+      ${shipPreviewHTML(type, placement ? placement.rotation : (selectedShipId === type.id ? pendingRotation : 0))}
+      <span style="flex:1;">${type.name} <span style="opacity:0.6;">(${type.cells.length} cells)</span></span>
+      ${placement
+        ? `<button class="btn danger" data-remove="${type.id}" style="padding:4px 8px;font-size:10.5px;">Remove</button>`
+        : `<button class="btn" data-place="${type.id}" style="padding:4px 8px;font-size:10.5px;">${selectedShipId === type.id ? 'Selected' : 'Place'}</button>`
+      }
+    `;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('[data-place]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedShipId = parseInt(btn.dataset.place, 10);
+      pendingRotation = 0;
+      renderShipPalette();
+      updateRotationRow();
+    });
+  });
+  wrap.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.remove, 10);
+      if(!confirm('Remove this ship from the board?')) return;
+      delete boardState[currentTeam].shipPlacements[id];
+      renderShipPalette();
+      renderBoard();
+      saveTeam(currentTeam, { shipPlacements: boardState[currentTeam].shipPlacements });
+    });
+  });
+}
+
+function updateRotationRow(){
+  const row = document.getElementById('rotationRow');
+  if(!row) return;
+  if(selectedShipId == null){
+    row.style.display = 'none';
+    row.innerHTML = '';
+    return;
+  }
+  const type = SHIP_TYPES.find(s => s.id === selectedShipId);
+  row.style.display = 'flex';
+  row.innerHTML = `
+    <span style="font-size:11.5px;">Placing: <b style="color:var(--gold-bright);">${type.name}</b> — Rotation: <b id="rotationLabel">${pendingRotation}°</b></span>
+    <button class="btn" id="rotateBtn">Rotate 90°</button>
+    <button class="btn danger" id="cancelPlaceBtn">Cancel</button>
+  `;
+  document.getElementById('rotateBtn').addEventListener('click', () => {
+    pendingRotation = (pendingRotation + 90) % 360;
+    updateRotationRow();
+    renderShipPalette();
+  });
+  document.getElementById('cancelPlaceBtn').addEventListener('click', () => {
+    selectedShipId = null;
+    pendingRotation = 0;
+    clearPreview();
+    renderShipPalette();
+    updateRotationRow();
+  });
+}
+
+function showPlacementPreview(i){
+  clearPreview();
+  const {row, col} = tileToRC(i);
+  const indices = computeShipIndices(selectedShipId, pendingRotation, row, col);
+  const err = validatePlacement(currentTeam, selectedShipId, indices);
+  const cls = err ? 'ship-preview-bad' : 'ship-preview-ok';
+  (indices || []).forEach(idx => {
+    const el = boardEl.children[idx];
+    if(el) el.classList.add(cls);
+  });
+  lastPreviewIndices = indices || [];
+}
+function clearPreview(){
+  lastPreviewIndices.forEach(idx => {
+    const el = boardEl.children[idx];
+    if(el){ el.classList.remove('ship-preview-ok'); el.classList.remove('ship-preview-bad'); }
+  });
+  lastPreviewIndices = [];
+}
+
+function attemptPlaceShip(i){
+  const {row, col} = tileToRC(i);
+  const indices = computeShipIndices(selectedShipId, pendingRotation, row, col);
+  const err = validatePlacement(currentTeam, selectedShipId, indices);
+  if(err){ alert(err); return; }
+  boardState[currentTeam].shipPlacements[selectedShipId] = { rotation: pendingRotation, indices };
+  selectedShipId = null;
+  pendingRotation = 0;
+  clearPreview();
+  renderShipPalette();
+  updateRotationRow();
+  renderBoard();
+  saveTeam(currentTeam, { shipPlacements: boardState[currentTeam].shipPlacements });
 }
 
 // ---- tile interaction ----
 function handleTileClick(i){
   if(isAdmin && placementMode){
-    toggleShip(i);
+    if(selectedShipId != null) attemptPlaceShip(i);
     return;
   }
   if(!isAdmin && !captainAuth[currentTeam]){
@@ -736,21 +1103,19 @@ function handleTileClick(i){
 
 function toggleTile(i){
   const data = boardState[currentTeam];
-  data.state[i] = !data.state[i];
+  const newVal = !data.state[i];
+  data.state[i] = newVal;
   renderBoard();
   saveTeam(currentTeam, { state: data.state });
-}
-
-function toggleShip(i){
-  const data = boardState[currentTeam];
-  data.ships[i] = !data.ships[i];
-  renderBoard();
-  saveTeam(currentTeam, { ships: data.ships });
+  logAction(currentTeam, i, newVal ? 'marked' : 'unmarked');
 }
 
 // ---- Firebase read/write ----
 function teamRef(team){
   return doc(db, 'boards', team);
+}
+function gmLogRef(){
+  return doc(db, 'boards', 'gmlog');
 }
 
 async function saveTeam(team, partial){
@@ -762,6 +1127,20 @@ async function saveTeam(team, partial){
     console.error('Save failed', e);
     setSyncStatus('error');
   }
+}
+
+function logAction(team, index, action){
+  const t = tiles[index];
+  if(!t) return;
+  const entry = {
+    ts: Date.now(),
+    team,
+    task: t.task,
+    tier: t.tier,
+    action,
+    name: (localStorage.getItem('battleship-bingo-name') || '').trim() || 'Unknown'
+  };
+  updateDoc(gmLogRef(), { entries: arrayUnion(entry) }).catch(e => console.error('GM log failed', e));
 }
 
 function setSyncStatus(status){
@@ -779,14 +1158,32 @@ function subscribeTeam(team){
     if(snap.exists()){
       const d = snap.data();
       if(Array.isArray(d.state) && d.state.length === TOTAL) boardState[team].state = d.state;
-      if(Array.isArray(d.ships) && d.ships.length === TOTAL) boardState[team].ships = d.ships;
+      if(d.shipPlacements && typeof d.shipPlacements === 'object') boardState[team].shipPlacements = d.shipPlacements;
     }
     setSyncStatus('live');
-    if(team === currentTeam) renderBoard();
-    else updateCompareBar();
+    if(team === currentTeam && (currentView === 'teamA' || currentView === 'teamB')){
+      renderBoard();
+      renderShipPalette();
+      updateRotationRow();
+    } else {
+      updateCompareBar();
+      renderFleetPanel();
+    }
   }, (err) => {
     console.error('Snapshot error', err);
     setSyncStatus('error');
+  });
+}
+
+function subscribeGMLog(){
+  onSnapshot(gmLogRef(), (snap) => {
+    if(snap.exists()){
+      const d = snap.data();
+      gmLogEntries = Array.isArray(d.entries) ? d.entries : [];
+    }
+    if(currentView === 'gmlog') renderGMLog();
+  }, (err) => {
+    console.error('GM log snapshot error', err);
   });
 }
 
@@ -795,16 +1192,23 @@ async function ensureTeamDoc(team){
   if(!snap.exists()){
     await setDoc(teamRef(team), {
       state: new Array(TOTAL).fill(false),
-      ships: new Array(TOTAL).fill(false)
+      shipPlacements: {}
     });
+  }
+}
+async function ensureGMLogDoc(){
+  const snap = await getDoc(gmLogRef());
+  if(!snap.exists()){
+    await setDoc(gmLogRef(), { entries: [] });
   }
 }
 
 async function initFirebase(){
   setSyncStatus('connecting');
   try{
-    await Promise.all(TEAMS.map(ensureTeamDoc));
+    await Promise.all([...TEAMS.map(ensureTeamDoc), ensureGMLogDoc()]);
     TEAMS.forEach(subscribeTeam);
+    subscribeGMLog();
   }catch(e){
     console.error('Firebase init failed', e);
     setSyncStatus('error');
@@ -812,17 +1216,87 @@ async function initFirebase(){
   }
 }
 
-// ---- team tabs ----
-document.getElementById('tabA').addEventListener('click', () => switchTeam('teamA'));
-document.getElementById('tabB').addEventListener('click', () => switchTeam('teamB'));
+// ---- task list tab ----
+function renderTaskTable(){
+  const wrap = document.getElementById('taskTableWrap');
+  let rows = '';
+  TIER_ORDER.forEach(tier => {
+    SOURCE.filter(([t]) => t === tier).forEach(([t, task, count]) => {
+      rows += `<tr>
+        <td><span class="legend-swatch" style="display:inline-block;background:var(--${t});margin-right:6px;vertical-align:middle;"></span>${task}</td>
+        <td>${TIER_LABEL[t]}</td>
+        <td>${count}</td>
+      </tr>`;
+    });
+  });
+  wrap.innerHTML = `
+    <h3>Task List — All Board Tasks</h3>
+    <table class="task-table">
+      <thead><tr><th>Task</th><th>Tier</th><th>Tiles on board</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
 
-function switchTeam(team){
-  currentTeam = team;
-  document.getElementById('tabA').classList.toggle('active', team === 'teamA');
-  document.getElementById('tabB').classList.toggle('active', team === 'teamB');
-  document.getElementById('adminTeamLabel').textContent = team === 'teamA' ? 'Team A' : 'Team B';
-  updateCaptainButton();
-  renderBoard();
+// ---- GM log tab ----
+function renderGMLog(){
+  const wrap = document.getElementById('gmPanel');
+  const sorted = gmLogEntries.slice().sort((a,b) => b.ts - a.ts);
+  const rows = sorted.map(e => `<tr>
+    <td>${new Date(e.ts).toLocaleString()}</td>
+    <td>${e.team === 'teamA' ? 'Team A' : 'Team B'}</td>
+    <td>${e.task}</td>
+    <td>${TIER_LABEL[e.tier] || e.tier}</td>
+    <td>${e.action === 'marked' ? 'Marked complete' : 'Un-marked'}</td>
+    <td>${e.name}</td>
+  </tr>`).join('');
+  wrap.innerHTML = `
+    <h3>Game Master — Completion Log <button class="btn" id="gmLogoutBtn" style="float:right;font-size:10.5px;padding:5px 10px;">Exit GM mode</button></h3>
+    <table class="task-table">
+      <thead><tr><th>Time</th><th>Team</th><th>Task</th><th>Tier</th><th>Action</th><th>By</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" style="text-align:center;">No activity yet.</td></tr>'}</tbody>
+    </table>
+  `;
+  const logoutBtn = document.getElementById('gmLogoutBtn');
+  if(logoutBtn) logoutBtn.addEventListener('click', () => {
+    isGM = false;
+    document.getElementById('gmBtn').textContent = 'Game Master';
+    document.getElementById('gmBtn').classList.remove('active-toggle');
+    document.getElementById('tabGM').style.display = 'none';
+    switchView('teamA');
+  });
+}
+
+// ---- view / tab switching ----
+document.getElementById('tabA').addEventListener('click', () => switchView('teamA'));
+document.getElementById('tabB').addEventListener('click', () => switchView('teamB'));
+document.getElementById('tabTasks').addEventListener('click', () => switchView('tasklist'));
+document.getElementById('tabGM').addEventListener('click', () => { if(isGM) switchView('gmlog'); });
+
+function switchView(view){
+  currentView = view;
+  document.getElementById('tabA').classList.toggle('active', view === 'teamA');
+  document.getElementById('tabB').classList.toggle('active', view === 'teamB');
+  document.getElementById('tabTasks').classList.toggle('active', view === 'tasklist');
+  document.getElementById('tabGM').classList.toggle('active', view === 'gmlog');
+
+  const isTeamView = (view === 'teamA' || view === 'teamB');
+  document.getElementById('boardFrame').style.display = isTeamView ? '' : 'none';
+  document.getElementById('legend').style.display = isTeamView ? '' : 'none';
+  document.getElementById('taskTableWrap').style.display = view === 'tasklist' ? '' : 'none';
+  document.getElementById('gmPanel').style.display = view === 'gmlog' ? '' : 'none';
+  document.getElementById('adminPanel').style.display = (isTeamView && isAdmin) ? '' : 'none';
+
+  if(isTeamView){
+    currentTeam = view;
+    document.getElementById('adminTeamLabel').textContent = view === 'teamA' ? 'Team A' : 'Team B';
+    updateCaptainButton();
+    renderBoard();
+    renderShipPalette();
+    updateRotationRow();
+  }
+  if(view === 'tasklist') renderTaskTable();
+  if(view === 'gmlog') renderGMLog();
 }
 
 function updateCaptainButton(){
@@ -865,6 +1339,7 @@ const adminBtn = document.getElementById('adminBtn');
 adminBtn.addEventListener('click', () => {
   if(isAdmin){
     adminPanel.classList.toggle('open');
+    adminPanel.style.display = adminPanel.classList.contains('open') ? '' : 'none';
     return;
   }
   const pw = prompt('Admin password:');
@@ -872,8 +1347,11 @@ adminBtn.addEventListener('click', () => {
   if(pw === ADMIN_PASSWORD){
     isAdmin = true;
     adminPanel.classList.add('open');
+    adminPanel.style.display = '';
     adminBtn.classList.add('active-toggle');
     adminBtn.textContent = 'Admin ✓';
+    renderShipPalette();
+    updateRotationRow();
   } else {
     alert('Incorrect password.');
   }
@@ -901,7 +1379,11 @@ document.getElementById('captainBtn').addEventListener('click', () => {
 document.getElementById('logoutAdminBtn').addEventListener('click', () => {
   isAdmin = false;
   placementMode = false;
+  selectedShipId = null;
+  pendingRotation = 0;
+  clearPreview();
   adminPanel.classList.remove('open');
+  adminPanel.style.display = 'none';
   adminBtn.classList.remove('active-toggle');
   adminBtn.textContent = 'Admin';
   document.getElementById('placementModeBtn').textContent = 'Enable placement mode';
@@ -913,36 +1395,88 @@ document.getElementById('placementModeBtn').addEventListener('click', (e) => {
   placementMode = !placementMode;
   e.target.textContent = placementMode ? 'Disable placement mode' : 'Enable placement mode';
   e.target.classList.toggle('active-toggle', placementMode);
+  if(!placementMode){
+    selectedShipId = null;
+    pendingRotation = 0;
+    clearPreview();
+    renderShipPalette();
+    updateRotationRow();
+  }
   renderBoard();
 });
 
 document.getElementById('randomizeShipsBtn').addEventListener('click', () => {
-  const n = Math.max(1, Math.min(TOTAL, parseInt(document.getElementById('randomShipCount').value, 10) || 0));
-  const data = boardState[currentTeam];
-  const indices = Array.from({length: TOTAL}, (_, i) => i);
-  for(let i = indices.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [indices[i], indices[j]] = [indices[j], indices[i]];
-  }
-  const newShips = new Array(TOTAL).fill(false);
-  indices.slice(0, n).forEach(i => newShips[i] = true);
-  data.ships = newShips;
+  const teamLabel = currentTeam === 'teamA' ? 'Team A' : 'Team B';
+  if(!confirm(`Randomly place all ${SHIP_TYPES.length} ships for ${teamLabel}? This replaces any current placements.`)) return;
+  const newPlacements = {};
+  const shuffledTypes = SHIP_TYPES.slice().sort(() => Math.random() - 0.5);
+  shuffledTypes.forEach(type => {
+    let placed = false;
+    for(let attempt = 0; attempt < 400 && !placed; attempt++){
+      const rotation = [0,90,180,270][Math.floor(Math.random()*4)];
+      const row = Math.floor(Math.random()*14);
+      const col = Math.floor(Math.random()*14);
+      const indices = computeShipIndices(type.id, rotation, row, col);
+      if(!indices) continue;
+      const occupied = new Set(Object.values(newPlacements).flatMap(p => p.indices));
+      if(indices.some(idx => occupied.has(idx))) continue;
+      const legCount = indices.filter(idx => tiles[idx].tier === 'legendary').length;
+      if(legCount > 1) continue;
+      newPlacements[type.id] = { rotation, indices };
+      placed = true;
+    }
+  });
+  boardState[currentTeam].shipPlacements = newPlacements;
+  selectedShipId = null;
+  pendingRotation = 0;
+  clearPreview();
+  renderShipPalette();
+  updateRotationRow();
   renderBoard();
-  saveTeam(currentTeam, { ships: data.ships });
+  saveTeam(currentTeam, { shipPlacements: newPlacements });
+  const count = Object.keys(newPlacements).length;
+  if(count < SHIP_TYPES.length){
+    alert(`Placed ${count}/${SHIP_TYPES.length} ships — the board got too crowded for the rest. Try again, or place the remainder manually.`);
+  }
 });
 
 document.getElementById('clearShipsBtn').addEventListener('click', () => {
-  if(!confirm(`Clear all hidden ships on ${currentTeam === 'teamA' ? 'Team A' : 'Team B'}'s board?`)) return;
-  const data = boardState[currentTeam];
-  data.ships = new Array(TOTAL).fill(false);
+  if(!confirm(`Clear all placed ships on ${currentTeam === 'teamA' ? 'Team A' : 'Team B'}'s board?`)) return;
+  boardState[currentTeam].shipPlacements = {};
+  selectedShipId = null;
+  pendingRotation = 0;
+  clearPreview();
+  renderShipPalette();
+  updateRotationRow();
   renderBoard();
-  saveTeam(currentTeam, { ships: data.ships });
+  saveTeam(currentTeam, { shipPlacements: {} });
+});
+
+// ---- Game Master ----
+document.getElementById('gmBtn').addEventListener('click', () => {
+  if(isGM){
+    switchView('gmlog');
+    return;
+  }
+  const pw = prompt('Game Master password:');
+  if(pw === null) return;
+  if(pw === GM_PASSWORD){
+    isGM = true;
+    const btn = document.getElementById('gmBtn');
+    btn.textContent = 'Game Master ✓';
+    btn.classList.add('active-toggle');
+    document.getElementById('tabGM').style.display = '';
+    switchView('gmlog');
+  } else {
+    alert('Incorrect password.');
+  }
 });
 
 // ---- boot ----
 loadName();
 updateCaptainButton();
 renderBoard();
+renderTaskTable();
 initFirebase();
 </script>
 </body>
