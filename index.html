@@ -136,53 +136,40 @@
   .team-tab[data-team="tasklist"].active{box-shadow:inset 0 3px 0 var(--epic);}
   .team-tab[data-team="gmlog"].active{box-shadow:inset 0 3px 0 var(--legendary);}
 
-  /* comparison bar — always visible for both teams */
-  .compare{
-    max-width:640px;
-    margin:0 auto 6px;
+
+  /* ship shapes reference panel — shown to everyone, no progress info */
+  .ship-shapes-panel{
+    max-width:900px;
+    margin:18px auto 6px;
     background:var(--wood-dark);
     border:2px solid var(--gold);
-    border-radius:3px;
-    padding:10px 14px;
+    border-radius:6px;
+    padding:12px 16px;
     box-shadow:0 3px 8px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.4);
   }
-  .compare-row{
+  .ship-shapes-panel h4{
+    margin:0 0 10px;
+    font-family:'Cinzel', serif;
+    font-size:14px;
+    letter-spacing:0.03em;
+    color:var(--gold-bright);
+    text-align:center;
+  }
+  .ship-shapes-grid{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:14px 22px;
+  }
+  .ship-shape-item{
     display:flex;
     align-items:center;
     gap:8px;
     font-size:11.5px;
-    margin:4px 0;
-  }
-  .compare-row .team-name{
-    width:64px;
-    flex-shrink:0;
-    font-weight:700;
-    letter-spacing:0.03em;
-  }
-  .compare-row.a .team-name{color:var(--teamA);}
-  .compare-row.b .team-name{color:var(--teamB);}
-  .compare-track{
-    position:relative;
-    flex:1;
-    height:14px;
-    background:#1a1a1a;
-    border-radius:2px;
-    overflow:hidden;
-  }
-  .compare-fill{height:100%; transition:width 0.4s ease;}
-  .compare-row.a .compare-fill{background:linear-gradient(90deg, #7a5e10, var(--teamA));}
-  .compare-row.b .compare-fill{background:linear-gradient(90deg, #1f4e6b, var(--teamB));}
-  .compare-pct{width:42px; text-align:right; font-variant-numeric:tabular-nums; color:var(--parchment-dark);}
-
-  .progress-label{
-    text-align:center;
-    font-size:12px;
-    letter-spacing:0.06em;
-    margin:10px 0 4px;
     color:var(--parchment-dark);
-    font-variant-numeric:tabular-nums;
   }
-  .progress-label b{color:var(--gold-bright);}
+  .ship-shape-item .ship-shape-name{white-space:nowrap;}
+  .ship-shape-item .ship-shape-name b{color:var(--gold-bright);}
 
   /* fleet status panel — shows ship shapes below the tracking bar */
   .fleet-panel{
@@ -371,7 +358,7 @@
     position:relative;
     aspect-ratio:1/1;
     border-radius:3px;
-    border:1px solid rgba(0,0,0,0.35);
+    border:3px solid rgba(0,0,0,0.35);
     background:var(--parchment);
     color:var(--ink);
     cursor:pointer;
@@ -397,17 +384,12 @@
     outline-offset:2px;
   }
 
-  .tile-cat-bar{
-    position:absolute;
-    top:0;left:0;right:0;
-    height:4px;
-  }
-  .tier-common{background:var(--common);}
-  .tier-uncommon{background:var(--uncommon);}
-  .tier-rare{background:var(--rare);}
-  .tier-epic{background:var(--epic);}
-  .tier-legendary{background:var(--legendary);}
-  .tier-bonus{background:var(--bonus);}
+  .tile.tier-common{border-color:var(--common);}
+  .tile.tier-uncommon{border-color:var(--uncommon);}
+  .tile.tier-rare{border-color:var(--rare);}
+  .tile.tier-epic{border-color:var(--epic);}
+  .tile.tier-legendary{border-color:var(--legendary);}
+  .tile.tier-bonus{border-color:var(--bonus);}
 
   .tile-text{
     margin-top:3px;
@@ -529,7 +511,7 @@
   }
 
   @media (prefers-reduced-motion: reduce){
-    .tile, .hit-mark, .progress-fill, .compare-fill{transition:none;}
+    .tile, .hit-mark{transition:none;}
   }
 </style>
 </head>
@@ -549,19 +531,10 @@
     <button class="team-tab" id="tabGM" data-team="gmlog" style="display:none;">🗒 GM Log</button>
   </div>
 
-  <div class="compare">
-    <div class="compare-row a">
-      <span class="team-name">Team A</span>
-      <div class="compare-track"><div class="compare-fill" id="fillA" style="width:0%"></div></div>
-      <span class="compare-pct" id="pctA">0%</span>
-    </div>
-    <div class="compare-row b">
-      <span class="team-name">Team B</span>
-      <div class="compare-track"><div class="compare-fill" id="fillB" style="width:0%"></div></div>
-      <span class="compare-pct" id="pctB">0%</span>
-    </div>
+  <div class="ship-shapes-panel" id="shipShapesPanel">
+    <h4>🚢 Fleet Reference — Ship Shapes</h4>
+    <div class="ship-shapes-grid" id="shipShapesGrid"></div>
   </div>
-  <div class="progress-label" id="progressLabel">Loading board…</div>
 
   <div class="fleet-panel" id="fleetPanel">
     <div class="fleet-col"><h4>⚓ Team A Fleet</h4><ul class="fleet-list" id="fleetListA"></ul></div>
@@ -571,7 +544,7 @@
   <div class="controls">
     <input type="text" id="nameInput" placeholder="Your name (optional)" />
     <button class="btn" id="saveNameBtn">Save name</button>
-    <button class="btn danger" id="resetBtn">Reset this team's board</button>
+    <button class="btn danger" id="resetBtn" style="display:none;">Reset this team's board</button>
     <button class="btn" id="captainBtn">Captain</button>
     <button class="btn" id="adminBtn">Admin</button>
     <button class="btn" id="gmBtn">Game Master</button>
@@ -626,10 +599,10 @@ const db = getFirestore(app);
 
 // Change these before publishing the page publicly.
 const ADMIN_PASSWORD = "kraken";
-const GM_PASSWORD = "periscope";
+const GM_PASSWORD = "garage door";
 const CAPTAIN_PASSWORDS = {
-  teamA: "teamA-captain",
-  teamB: "teamB-captain"
+  teamA: "urf",
+  teamB: "mayhem"
 };
 
 // ---- Source task pool: [tier, task, tileCount] ----
@@ -652,13 +625,13 @@ const SOURCE = [
   ['common',"Easy clue x amount",3],
   ['common',"Medium clue x amount",3],
   ['common',"Hard clue x amount",3],
-  // UNCOMMON — 52 tiles
+  // UNCOMMON — 55 tiles
   ['uncommon',">500k drop",8],
   ['uncommon',"Ancient shard (non-Skotizo)",4],
   ['uncommon',"Bottomless bucket",2],
   ['uncommon',"Cow slips",2],
-  ['uncommon',"Titan's crown piece",2],
-  ['uncommon',"Tzhaar drop",2],
+  ['uncommon',"Titan's crown piece",3],
+  ['uncommon',"Tzhaar drop",3],
   ['uncommon',"Earn Larran's key",5],
   ['uncommon',"Brimstone key",5],
   ['uncommon',"Immaculate mole skin",2],
@@ -672,12 +645,12 @@ const SOURCE = [
   ['uncommon',"Black mask drop",1],
   ['uncommon',"Elite clue x amount",3],
   ['uncommon',"Master clue x amount",3],
-  // RARE — 80 tiles
+  // RARE — 81 tiles
   ['rare',"Pet (any)",1],
   ['rare',"Dragon boots drop",1],
   ['rare',"GOTR (bag/ring/needle/protector/lantern)",1],
   ['rare',"Off-hand skilling tool (knife, hammer, chisel)",1],
-  ['rare',"Abyssal whip",3],
+  ['rare',"Abyssal whip",4],
   ['rare',"Vorkath's head",2],
   ['rare',"Granite hammer",2],
   ['rare',"Saradomin cudgel",2],
@@ -709,23 +682,19 @@ const SOURCE = [
   // EPIC — 8 tiles
   ['epic',"Tormented synapse",2],
   ['epic',"Zulrah unique",3],
-  ['epic',"Tombs of Amascut (ToA) unique",1],
-  ['epic',"Theatre of Blood (ToB) unique",1],
-  ['epic',"Chambers of Xeric (CoX) unique",1],
+  ['epic',"Yama unique",1],
+  ['epic',"Muspah unique",1],
+  ['epic',"Duke Sucellus unique",1],
   // LEGENDARY — 9 tiles
   ['legendary',"Nex unique",1],
-  ['legendary',"Yama unique",1],
-  ['legendary',"Duke Sucellus unique",1],
-  ['legendary',"Muspah unique",1],
+  ['legendary',"Tombs of Amascut (ToA) unique",1],
+  ['legendary',"Chambers of Xeric (CoX) unique",1],
+  ['legendary',"Theatre of Blood (ToB) unique",1],
   ['legendary',"Pet (exclusive, no chompy/ele)",1],
   ['legendary',"Maggot king fang",1],
   ['legendary',"DT2 unique (vestige/axe/ring/pet)",1],
   ['legendary',"Crystal armour seed",1],
   ['legendary',"Crystal weapon seed",1],
-  // BONUS — 3 tiles (fills the board to a full 14x14)
-  ['bonus',"Bonus tile — add your task",1],
-  ['bonus',"Bonus tile — add your task",1],
-  ['bonus',"Bonus tile — add your task",1],
 ];
 
 const TIER_LABEL = {
@@ -734,9 +703,8 @@ const TIER_LABEL = {
   rare:"Rare",
   epic:"Epic",
   legendary:"Legendary",
-  bonus:"Bonus"
 };
-const TIER_ORDER = ['legendary','epic','rare','uncommon','common','bonus'];
+const TIER_ORDER = ['legendary','epic','rare','uncommon','common'];
 
 // flatten
 let tiles = [];
@@ -895,7 +863,7 @@ function renderBoard(){
     const hasShip = shipSet.has(i);
     const el = document.createElement('button');
     el.type = 'button';
-    let cls = 'tile';
+    let cls = 'tile tier-' + t.tier;
     if(done) cls += ' done';
     if(done && hasShip) cls += ' is-hit';
     if(done && !hasShip) cls += ' is-miss';
@@ -911,7 +879,6 @@ function renderBoard(){
     const showLegendaryHint = isAdmin && placementMode && t.tier === 'legendary' && !done;
 
     el.innerHTML = `
-      <div class="tile-cat-bar tier-${t.tier}"></div>
       <div class="tile-text">${t.task}</div>
       <div class="hit-mark">${markSVG}</div>
       ${showShipMarker ? `<div class="ship-marker">${shipMarkerSVG()}</div>` : ''}
@@ -928,23 +895,21 @@ function renderBoard(){
 }
 
 function updateProgressLabel(){
-  const data = boardState[currentTeam];
-  const done = data.state.filter(Boolean).length;
-  const pct = Math.round((done/TOTAL)*100);
-  document.getElementById('progressLabel').innerHTML =
-    `<b>${done}</b> / ${TOTAL} tiles sunk on ${currentTeam === 'teamA' ? 'Team A' : 'Team B'} (${pct}%)`;
-  updateCompareBar();
   renderFleetPanel();
 }
 
-function updateCompareBar(){
-  TEAMS.forEach((team, idx) => {
-    const data = boardState[team];
-    const done = data.state.filter(Boolean).length;
-    const pct = Math.round((done/TOTAL)*100);
-    const suffix = idx === 0 ? 'A' : 'B';
-    document.getElementById('fill' + suffix).style.width = pct + '%';
-    document.getElementById('pct' + suffix).textContent = pct + '%';
+function renderShipShapesPanel(){
+  const grid = document.getElementById('shipShapesGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  SHIP_TYPES.forEach(type => {
+    const item = document.createElement('div');
+    item.className = 'ship-shape-item';
+    item.innerHTML = `
+      ${shipPreviewHTML(type, 0)}
+      <span class="ship-shape-name"><b>${type.name}</b> (${type.cells.length})</span>
+    `;
+    grid.appendChild(item);
   });
 }
 
@@ -1286,6 +1251,7 @@ function switchView(view){
   document.getElementById('taskTableWrap').style.display = view === 'tasklist' ? '' : 'none';
   document.getElementById('gmPanel').style.display = view === 'gmlog' ? '' : 'none';
   document.getElementById('adminPanel').style.display = (isTeamView && isAdmin) ? '' : 'none';
+  updateResetBtnVisibility();
 
   if(isTeamView){
     currentTeam = view;
@@ -1297,6 +1263,12 @@ function switchView(view){
   }
   if(view === 'tasklist') renderTaskTable();
   if(view === 'gmlog') renderGMLog();
+}
+
+function updateResetBtnVisibility(){
+  const btn = document.getElementById('resetBtn');
+  const isTeamView = (currentView === 'teamA' || currentView === 'teamB');
+  btn.style.display = (isTeamView && isAdmin) ? '' : 'none';
 }
 
 function updateCaptainButton(){
@@ -1313,6 +1285,10 @@ function updateCaptainButton(){
 
 // ---- reset ----
 document.getElementById('resetBtn').addEventListener('click', () => {
+  if(!isAdmin){
+    alert('Only an admin can reset a board.');
+    return;
+  }
   const teamLabel = currentTeam === 'teamA' ? 'Team A' : 'Team B';
   if(confirm(`Reset ${teamLabel}'s board for everyone? Ships stay in place. This cannot be undone.`)){
     const data = boardState[currentTeam];
@@ -1350,6 +1326,7 @@ adminBtn.addEventListener('click', () => {
     adminPanel.style.display = '';
     adminBtn.classList.add('active-toggle');
     adminBtn.textContent = 'Admin ✓';
+    updateResetBtnVisibility();
     renderShipPalette();
     updateRotationRow();
   } else {
@@ -1386,6 +1363,7 @@ document.getElementById('logoutAdminBtn').addEventListener('click', () => {
   adminPanel.style.display = 'none';
   adminBtn.classList.remove('active-toggle');
   adminBtn.textContent = 'Admin';
+  updateResetBtnVisibility();
   document.getElementById('placementModeBtn').textContent = 'Enable placement mode';
   document.getElementById('placementModeBtn').classList.remove('active-toggle');
   renderBoard();
@@ -1476,6 +1454,7 @@ document.getElementById('gmBtn').addEventListener('click', () => {
 loadName();
 updateCaptainButton();
 renderBoard();
+renderShipShapesPanel();
 renderTaskTable();
 initFirebase();
 </script>
